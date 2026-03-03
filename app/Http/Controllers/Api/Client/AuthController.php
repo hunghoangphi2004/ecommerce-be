@@ -43,10 +43,10 @@ class AuthController extends Controller
             }
 
             $user = User::create([
-                'name' => $request->name,
-                'email' => $request->email,
-                'phone' => $request->phone,
-                'password' => Hash::make($request->password),
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+                'phone' => $validated['phone'] ?? null,
+                'password' => Hash::make($validated['password']),
                 'avatar' => $avatarUrl,
                 'avatar_public_id' => $avatarPublicId,
             ]);
@@ -60,9 +60,7 @@ class AuthController extends Controller
             ], 201);
         } catch (\Throwable $e) {
             return response()->json([
-                'error' => $e->getMessage(),
-                'line' => $e->getLine(),
-                'file' => $e->getFile(),
+                'message' => $e->getMessage(),
             ], 500);
         }
     }
@@ -78,7 +76,7 @@ class AuthController extends Controller
             if (!$token = Auth::attempt($credentials)) {
                 return response()->json([
                     'message' => 'Email hoặc mật khẩu không đúng'
-                ], 401);
+                ], 422);
             }
 
             $user = Auth::user();
