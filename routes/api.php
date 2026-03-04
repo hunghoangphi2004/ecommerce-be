@@ -10,7 +10,3 @@ Route::prefix('auth')->group(function ($router) {
     Route::get('/profile', [AuthController::class, 'profile'])->middleware('auth:api_user');
     Route::post('/refresh', [AuthController::class, 'refresh'])->middleware('auth:api_user');
 });
-
-Route::get('/check-jwt', function () {
-    return config('jwt.secret');
-});
