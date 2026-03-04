@@ -60,7 +60,8 @@ class AuthController extends Controller
             ], 201);
         } catch (\Throwable $e) {
             return response()->json([
-                'message' => $e->getMessage(),
+                'error' => $e->getMessage(),
+                'line' => $e->getLine(),
             ], 500);
         }
     }
