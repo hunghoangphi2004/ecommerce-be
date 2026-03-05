@@ -108,13 +108,14 @@ class AuthController extends Controller
             Auth::logout();
 
             return response()->json([
+                'success' => true,
                 'message' => 'Đăng xuất thành công'
             ], 200);
         } catch (\Throwable $e) {
             return response()->json([
-                'error' => $e->getMessage(),
-                'line' => $e->getLine(),
-                'file' => $e->getFile(),
+                'success' => false,
+                'message' => 'Đăng xuất thất bại',
+                'error' => config('app.debug') ? $e->getMessage() : null
             ], 500);
         }
     }
