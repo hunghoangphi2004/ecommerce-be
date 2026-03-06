@@ -16,6 +16,7 @@ class Category extends Model
         'description',
         'parent_id',
         'thumbnail',
+        'thumbnail_public_id',
         'status',
         'position',
     ];

@@ -54,14 +54,16 @@ class AuthController extends Controller
             $token = JWTAuth::fromUser($user);
 
             return response()->json([
-                'message' => "Dang ky tai khoan thanh cong",
+                'success' => true,
+                'message' => "Đăng ký tài khoản thành công",
                 'user' => $user,
                 'tokenUser' => $token
             ], 201);
         } catch (\Throwable $e) {
             return response()->json([
-                'error' => $e->getMessage(),
-                'line' => $e->getLine(),
+                'success' => false,
+                'message' => 'Đăng ký thất bại',
+                'error' => config('app.debug') ? $e->getMessage() : null
             ], 500);
         }
     }
@@ -83,6 +85,7 @@ class AuthController extends Controller
             $user = Auth::user();
 
             return response()->json([
+                'success' => true,
                 'message' => 'Đăng nhập thành công',
                 'user' => [
                     'id' => $user->id,
@@ -95,9 +98,9 @@ class AuthController extends Controller
             ], 200);
         } catch (\Throwable $e) {
             return response()->json([
-                'error' => $e->getMessage(),
-                'line' => $e->getLine(),
-                'file' => $e->getFile(),
+                'success' => false,
+                'message' => 'Đăng nhập thất bại',
+                'error' => config('app.debug') ? $e->getMessage() : null
             ], 500);
         }
     }
@@ -127,6 +130,7 @@ class AuthController extends Controller
             $user = $request->user();
 
             return response()->json([
+                'success' => true,
                 'message' => 'Thành công',
                 'user' => $user->only([
                     'id',
@@ -138,9 +142,9 @@ class AuthController extends Controller
             ], 200);
         } catch (\Throwable $e) {
             return response()->json([
-                'error' => $e->getMessage(),
-                'line' => $e->getLine(),
-                'file' => $e->getFile(),
+                'success' => false,
+                'message' => 'Lấy thông tin cá nhân thất bại',
+                'error' => config('app.debug') ? $e->getMessage() : null
             ], 500);
         }
     }
@@ -151,6 +155,7 @@ class AuthController extends Controller
             $newToken = Auth::refresh();
 
             return response()->json([
+                'success' => true,
                 'message' => 'Refresh token thành công',
                 'access_token' => $newToken,
                 'token_type' => 'bearer',
@@ -158,7 +163,9 @@ class AuthController extends Controller
             ], 200);
         } catch (\Throwable $e) {
             return response()->json([
-                'message' => 'Token không thể refresh'
+                'success' => false,
+                'message' => 'Token không thể refresh',
+                'error' => config('app.debug') ? $e->getMessage() : null
             ], 401);
         }
     }

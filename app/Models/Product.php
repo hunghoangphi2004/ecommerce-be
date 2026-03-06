@@ -19,6 +19,7 @@ class Product extends Model
         'discount_percentage',
         'stock',
         'thumbnail',
+        'thumbnail_public_id',
         'status',
         'is_featured',
         'position',
