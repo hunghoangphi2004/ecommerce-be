@@ -21,6 +21,10 @@ class ProductController extends Controller
                 $query->where("status", $request->status);
             }
 
+            if ($request->has('category_id')) {
+                $query->where("category_id", $request->category_id);
+            }
+
             if ($request->search) {
                 $query->where("title", 'like', '%' . $request->search . '%');
             }
@@ -54,42 +58,69 @@ class ProductController extends Controller
         }
     }
 
-    public function create(Request $request)
+    public function detail($id)
     {
         try {
-            $validated = $request->validate(
-                [
-                    'category_id' => [
-                        'required',
-                        Rule::exists('categories', 'id')->whereNull('deleted_at')
-                    ],
-                    'title' => 'required|string|max:255',
+            $product = Product::find($id);
 
-                    'description' => 'nullable|string',
-                    'price' => 'required|numeric|min:0',
-                    'discount_percentage' => 'nullable|numeric|min:0|max:100',
-                    'stock' => 'required|integer|min:0',
-                    'thumbnail' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-                    'is_featured' => 'boolean',
-                    'position' => 'nullable|integer'
+            if (!$product) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Sản phẩm không tồn tại'
+                ], 404);
+            }
+
+            return response()->json($product, 200);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Lấy sản phẩm thất bại',
+                'error' => config('app.debug') ? $e->getMessage() : null
+            ], 500);
+        }
+    }
+
+    public function create(Request $request)
+    {
+
+        $validated = $request->validate(
+            [
+                'category_id' => [
+                    'required',
+                    Rule::exists('categories', 'id')->whereNull('deleted_at')
                 ],
-                [
-                    'category_id.required' => 'Danh mục là bắt buộc',
-                    'category_id.exists' => 'Danh mục không tồn tại hoặc đã bị xóa',
+                'title' => 'required|string|max:255',
 
-                    'title.required' => 'Tiêu đề là bắt buộc',
-                    'title.max' => 'Tiêu đề không được vượt quá 255 ký tự',
+                'description' => 'nullable|string',
+                'price' => 'required|numeric|min:0',
+                'discount_percentage' => 'nullable|numeric|min:0|max:100',
+                'stock' => 'required|integer|min:0',
+                'thumbnail' => 'nullable|image|max:2048',
+                'is_featured' => 'boolean',
+                'position' => 'nullable|integer'
+            ],
+            [
+                'category_id.required' => 'Danh mục là bắt buộc',
+                'category_id.exists' => 'Danh mục không tồn tại hoặc đã bị xóa',
 
-                    'price.required' => 'Giá là bắt buộc',
-                    'price.numeric' => 'Giá phải là số',
-                    'price.min' => "Giá phải lớn hơn 0",
+                'title.required' => 'Tiêu đề là bắt buộc',
+                'title.max' => 'Tiêu đề không được vượt quá 255 ký tự',
 
-                    'stock.required' => 'Số lượng là bắt buộc',
-                    'stock.integer' => 'Số lượng phải là số nguyên',
-                    'stock.min' => "Số lượng phải lớn hơn 0",
-                ]
-            );
+                'price.required' => 'Giá là bắt buộc',
+                'price.numeric' => 'Giá phải là số',
+                'price.min' => "Giá phải lớn hơn 0",
 
+                'stock.required' => 'Số lượng là bắt buộc',
+                'stock.integer' => 'Số lượng phải là số nguyên',
+                'stock.min' => "Số lượng phải lớn hơn 0",
+
+                'is_featured.boolean' => 'Nổi bật phải là true hoặc false',
+
+                'position.integer' => 'Vị trí để rỗng hoặc phải là số nguyên',
+            ]
+        );
+
+        try {
             $thumbnailUrl = null;
             $thumbnailPublicId = null;
 
@@ -175,7 +206,7 @@ class ProductController extends Controller
 
                     'stock' => 'sometimes|integer|min:0',
 
-                    'thumbnail' => 'sometimes|nullable|image|mimes:jpg,jpeg,png|max:2048',
+                    'thumbnail' => 'sometimes|nullable|image|max:2048',
 
                     'status' => 'sometimes|boolean',
 

@@ -29,6 +29,7 @@ Route::prefix('/admin')->group(function ($router) {
         Route::get('/', [ProductController::class, 'index']);
         Route::post('/create', [ProductController::class, 'create']);
         Route::patch('/edit/{id}', [ProductController::class, 'update']);
+        Route::get('/detail/{id}', [ProductController::class, 'detail']);
         Route::patch('/change-status/{id}', [ProductController::class, 'changeStatus']);
         Route::delete('/delete/{id}', [ProductController::class, 'destroy']);
     });
