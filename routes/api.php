@@ -36,6 +36,7 @@ Route::prefix('/admin')->group(function ($router) {
 
     Route::prefix('/categories')->group(function () {
         Route::get('/', [CategoryController::class, 'index']);
+        Route::get('/detail/{id}', [CategoryController::class, 'detail']);
         Route::post('/create', [CategoryController::class, 'create']);
         Route::patch('/edit/{id}', [CategoryController::class, 'update']);
         Route::patch('/change-status/{id}', [CategoryController::class, 'changeStatus']);

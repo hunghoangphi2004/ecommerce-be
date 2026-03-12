@@ -53,6 +53,28 @@ class CategoryController extends Controller
         }
     }
 
+    public function detail($id)
+    {
+        try {
+            $category = Category::find($id);
+
+            if (!$category) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Danh mục không tồn tại'
+                ], 404);
+            }
+
+            return response()->json($category, 200);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Lấy danh mục thất bại',
+                'error' => config('app.debug') ? $e->getMessage() : null
+            ], 500);
+        }
+    }
+
     public function create(Request $request)
     {
         try {
@@ -64,7 +86,7 @@ class CategoryController extends Controller
                         'nullable',
                         Rule::exists('categories', 'id')->whereNull('deleted_at')
                     ],
-                    'thumbnail' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+                    'thumbnail' => 'nullable|image|max:2048',
                     'position' => 'nullable|integer'
                 ],
                 [
@@ -159,7 +181,7 @@ class CategoryController extends Controller
                         Rule::exists('categories', 'id')->whereNull('deleted_at'),
                         'not_in:' . $id
                     ],
-                    'thumbnail' => 'sometimes|nullable|image|mimes:jpg,jpeg,png|max:2048',
+                    'thumbnail' => 'sometimes|nullable|image|max:2048',
                     'status' => 'sometimes|boolean',
                     'position' => 'sometimes|nullable|integer'
                 ],
