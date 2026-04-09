@@ -9,6 +9,7 @@ use GuzzleHttp\Handler\Proxy;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use App\Helpers\GetAllCategoryIdsHelper;
 
 class ProductController extends Controller
 {
@@ -22,7 +23,12 @@ class ProductController extends Controller
             }
 
             if ($request->has('category_id')) {
-                $query->where("category_id", $request->category_id);
+                $categoryIds = GetAllCategoryIdsHelper::getAllCategoryIds($request->category_id);
+                $query->whereIn("category_id", $categoryIds);
+            }
+
+            if ($request->has('branch_id')) {
+                $query->where("branch_id", $request->branch_id);
             }
 
             if ($request->search) {
@@ -89,6 +95,11 @@ class ProductController extends Controller
                     'required',
                     Rule::exists('categories', 'id')->whereNull('deleted_at')
                 ],
+
+                'branch_id' => [
+                    Rule::exists('branches', 'id')->whereNull('deleted_at')
+                ],
+
                 'title' => 'required|string|max:255',
 
                 'description' => 'nullable|string',
@@ -102,6 +113,8 @@ class ProductController extends Controller
             [
                 'category_id.required' => 'Danh mục là bắt buộc',
                 'category_id.exists' => 'Danh mục không tồn tại hoặc đã bị xóa',
+
+                'branch_id.exists' => 'Thương hiệu không tồn tại hoặc đã bị xóa',
 
                 'title.required' => 'Tiêu đề là bắt buộc',
                 'title.max' => 'Tiêu đề không được vượt quá 255 ký tự',
@@ -138,7 +151,7 @@ class ProductController extends Controller
             $originalSlug = $slug;
             $count = 1;
 
-            while (Product::where('slug', $slug)->exists()) {
+            while (Product::withTrashed()->where('slug', $slug)->exists()) {
                 $slug = $originalSlug . '-' . $count++;
             }
 
@@ -146,12 +159,14 @@ class ProductController extends Controller
 
             $product = Product::create([
                 'category_id' => $validated['category_id'],
+                'branch_id' => $validated['branch_id'] ?? null,
                 'title' => $validated['title'],
                 'slug' => $slug,
                 'description' => $validated['description'] ?? null,
                 'price' => $validated['price'],
                 'discount_percentage' => $validated['discount_percentage']  ?? 0,
                 'stock' => $validated['stock'],
+                'is_featured' => $validated['is_featured'] ?? false,
                 'thumbnail' => $thumbnailUrl,
                 'thumbnail_public_id' => $thumbnailPublicId,
                 'position' => $validated['position'] ?? $nextPosition
@@ -189,6 +204,10 @@ class ProductController extends Controller
                         'sometimes',
                         Rule::exists('categories', 'id')->whereNull('deleted_at')
                     ],
+                    'branch_id' => [
+                        'sometimes',
+                        Rule::exists('branches', 'id')->whereNull('deleted_at')
+                    ],
 
                     'title' => 'sometimes|string|max:255',
 
@@ -216,6 +235,8 @@ class ProductController extends Controller
                 ],
                 [
                     'category_id.exists' => 'Danh mục không tồn tại hoặc đã bị xóa',
+
+                    'branch_id.exists' => 'Thương hiệu không tồn tại hoặc đã bị xóa',
 
                     'title.max' => 'Tiêu đề không được vượt quá 255 ký tự',
 

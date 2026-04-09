@@ -12,6 +12,7 @@ class Product extends Model
 
     protected $fillable = [
         'category_id',
+        'branch_id',
         'title',
         'slug',
         'description',
@@ -31,9 +32,25 @@ class Product extends Model
         'status' => 'boolean',
         'is_featured' => 'boolean',
     ];
-    
 
-    public function category(){
+
+    public function category()
+    {
         return $this->belongsTo(Category::class);
+    }
+
+    public function branch()
+    {
+        return $this->belongsTo(Branch::class, 'branch_id', 'id');
+    }
+
+    public function cartItems()
+    {
+        return $this->hasMany(CartItem::class);
+    }
+
+    public function orderItems()
+    {
+        return $this->hasMany(OrderItem::class);
     }
 }

@@ -46,7 +46,6 @@ class User extends Authenticatable implements JWTSubject
     protected function casts(): array
     {
         return [
-            'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
     }
@@ -61,8 +60,13 @@ class User extends Authenticatable implements JWTSubject
         return [];
     }
 
-    public function isAdmin(): bool
+    public function cart()
     {
-        return $this->role === "admin";
+        return $this->hasOne(Cart::class);
+    }
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
     }
 }

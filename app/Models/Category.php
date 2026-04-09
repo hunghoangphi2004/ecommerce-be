@@ -10,7 +10,7 @@ class Category extends Model
 {
     use HasFactory, SoftDeletes;
 
-   protected $fillable = [
+    protected $fillable = [
         'title',
         'slug',
         'description',
@@ -25,17 +25,25 @@ class Category extends Model
     protected $casts = [
         'status' => 'boolean',
     ];
-    
 
-    public function parent(){
+
+    public function parent()
+    {
         return $this->belongsTo(Category::class, 'parent_id');
     }
 
-    public function children(){
+    public function children()
+    {
         return $this->hasMany(Category::class, 'parent_id');
     }
 
-    public function products(){
+    public function products()
+    {
         return $this->hasMany(Product::class);
+    }
+
+    public function childrenRecursive()
+    {
+        return $this->children()->with('childrenRecursive');
     }
 }
