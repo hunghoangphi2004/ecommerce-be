@@ -9,6 +9,8 @@ use App\Http\Controllers\Api\Admin\AccountController;
 use App\Http\Controllers\Api\Admin\RoleController;
 use App\Http\Controllers\Api\Client\OrderController;
 use App\Http\Controllers\Api\Admin\BranchController;
+use App\Http\Controllers\Api\Admin\PageController;
+use App\Http\Controllers\Api\Client\PageController as PageClientController;
 
 Route::prefix('auth')->group(function ($router) {
 
@@ -30,6 +32,10 @@ Route::prefix('home')->group(function ($router) {
     Route::get('/get-all-category', [HomeController::class, 'getAllCategory']);
     Route::get('/get-all-branch', [HomeController::class, 'getAllBranch']);
     Route::get('/get-branch/{slug}', [HomeController::class, 'getBranch']);
+});
+
+Route::prefix('pages')->group(function ($router) {
+    Route::get('/get-page/{slug}', [PageClientController::class, 'getPage']);
 });
 
 
@@ -72,6 +78,15 @@ Route::prefix('/admin')->group(function ($router) {
             Route::patch('/edit/{id}', [BranchController::class, 'update']);
             Route::patch('/change-status/{id}', [BranchController::class, 'changeStatus']);
             Route::delete('/delete/{id}', [BranchController::class, 'destroy']);
+        });
+
+        Route::prefix('/pages')->group(function () {
+            Route::get('/', [PageController::class, 'index']);
+            Route::get('/detail/{id}', [PageController::class, 'detail']);
+            Route::post('/create', [PageController::class, 'create']);
+            Route::patch('/edit/{id}', [PageController::class, 'update']);
+            // Route::patch('/change-status/{id}', [BranchController::class, 'changeStatus']);
+            Route::delete('/delete/{id}', [PageController::class, 'destroy']);
         });
 
         Route::prefix('/accounts')->group(function () {
